@@ -9,3 +9,7 @@ ForEx Conversion 1.0.1
 ForEx Conversion 1.0.2
 ================================================================================
 ~ Late service initialisation using boot()
+
+ForEx Conversion 1.0.3
+================================================================================
++ Caching in the ForEx service and improved Formatter service dependencies

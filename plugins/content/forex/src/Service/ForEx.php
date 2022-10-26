@@ -8,7 +8,9 @@
 
 namespace Joomla\Plugin\Content\ForEx\Service;
 
+use Joomla\CMS\Cache\CacheControllerFactoryInterface;
 use Joomla\CMS\Http\HttpFactory;
+use Joomla\DI\Container;
 use SimpleXMLElement;
 use Throwable;
 
@@ -42,10 +44,20 @@ class ForEx
      *
      * @since  1.0.0
      */
-    public function __construct()
+    public function __construct(Container $container)
     {
         // Initialise the exchange rates (if they have not already been initialised)
-        self::$exchangeRates = self::$exchangeRates ?? $this->loadRates();
+        self::$exchangeRates = self::$exchangeRates ??
+            $container
+                   ->get(CacheControllerFactoryInterface::class)
+                   ->createCacheController(
+                       'callback',
+                       [
+                           'defaultgroup' => 'com_postinstall',
+                           'lifetime'     => 1440,
+                           'caching'      => 1,
+                       ]
+                   )->get([$this, 'loadRates'], [], md5(__METHOD__));
     }
 
     /**
@@ -54,8 +66,8 @@ class ForEx
      * If neither of the currencies is EUR it will convert from the source currency to EUR to the target currency. Loss
      * of precision is to be expected in this case.
      *
-     * @param   string  $from   The currency to convert from
-     * @param   string  $to     The currency to convert to
+     * @param   string  $from  The currency to convert from
+     * @param   string  $to  The currency to convert to
      * @param   float   $value  The amount of money to convert
      *
      * @return  float|null
@@ -89,34 +101,13 @@ class ForEx
     }
 
     /**
-     * Converts from EUR to a given currency
-     *
-     * @param   string  $currency  The currency to convert to
-     * @param   float   $value     The amount of money to convert
-     *
-     * @return  float|null  NULL if we cannot convert to this currency
-     *
-     * @since   1.0.0
-     */
-    private function fromEuro(string $currency, float $value): ?float
-    {
-        $currency = strtoupper(trim($currency));
-
-        if (!isset(self::$exchangeRates[$currency])) {
-            return null;
-        }
-
-        return $value * self::$exchangeRates[$currency];
-    }
-
-    /**
      * Load the EUR-indexed forex exchange rates from the ECB
      *
      * @return  array
      *
      * @since   1.0.0
      */
-    private function loadRates(): array
+    public function loadRates(): array
     {
         $response = HttpFactory::getHttp()
                                ->get(self::RATE_SOURCE_URL, [], 5);
@@ -138,6 +129,27 @@ class ForEx
         }
 
         return $rates;
+    }
+
+    /**
+     * Converts from EUR to a given currency
+     *
+     * @param   string  $currency  The currency to convert to
+     * @param   float   $value     The amount of money to convert
+     *
+     * @return  float|null  NULL if we cannot convert to this currency
+     *
+     * @since   1.0.0
+     */
+    private function fromEuro(string $currency, float $value): ?float
+    {
+        $currency = strtoupper(trim($currency));
+
+        if (!isset(self::$exchangeRates[$currency])) {
+            return null;
+        }
+
+        return $value * self::$exchangeRates[$currency];
     }
 
     /**

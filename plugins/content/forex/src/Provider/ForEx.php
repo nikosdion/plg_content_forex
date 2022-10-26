@@ -26,7 +26,7 @@ class ForEx implements ServiceProviderInterface
             ForExService::class,
             function(Container $container)
             {
-                return new ForExService();
+                return new ForExService($container);
             }
         );
     }

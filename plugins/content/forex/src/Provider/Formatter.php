@@ -9,6 +9,8 @@
 
 namespace Joomla\Plugin\Content\ForEx\Provider;
 
+use Joomla\CMS\Application\CMSApplication;
+use Joomla\CMS\Factory;
 use Joomla\DI\Container;
 use Joomla\DI\ServiceProviderInterface;
 use Joomla\Plugin\Content\ForEx\Service\Formatter as FormatterService;
@@ -26,7 +28,10 @@ class Formatter implements ServiceProviderInterface
             FormatterService::class,
             function(Container $container)
             {
-                return new FormatterService();
+                /** @var CMSApplication $app */
+                $app = Factory::getApplication();
+
+                return new FormatterService($app);
             }
         );
     }

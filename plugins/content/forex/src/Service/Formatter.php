@@ -9,6 +9,7 @@
 namespace Joomla\Plugin\Content\ForEx\Service;
 
 use Exception;
+use Joomla\CMS\Application\CMSApplication;
 use Joomla\CMS\Factory;
 use NumberFormatter;
 
@@ -19,6 +20,25 @@ use NumberFormatter;
  */
 class Formatter
 {
+    /**
+     * @since 1.0.3
+     * @var   CMSApplication
+     */
+    private CMSApplication $app;
+
+    /**
+     * Constructor
+     *
+     * @param   CMSApplication  $app  The application we are running in
+     *
+     * @since   1.0.3
+     */
+    public function __construct(CMSApplication $app)
+    {
+        $this->app = $app;
+    }
+
+
     /**
      * Formats a currency value
      *
@@ -33,7 +53,7 @@ class Formatter
      */
     public function currency(string $currency, float $amount, ?string $locale = null): string
     {
-        $locale = $locale ?? Factory::getApplication()->getLanguage()->getLocale()[0];
+        $locale = $locale ?? $this->app->getLanguage()->getLocale()[0];
 
         // Prefer the PHP intl extension
         if (function_exists('numfmt_format_currency')) {
