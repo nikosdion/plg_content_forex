@@ -9,12 +9,15 @@
 namespace Joomla\Plugin\Content\ForEx\Extension;
 
 use Exception;
+use Joomla\CMS\Extension\BootableExtensionInterface;
 use Joomla\CMS\Plugin\CMSPlugin;
+use Joomla\DI\Container;
 use Joomla\Event\Event;
 use Joomla\Event\SubscriberInterface;
 use Joomla\Plugin\Content\ForEx\Service\ForEx;
 use Joomla\Plugin\Content\ForEx\Service\Formatter;
 use Joomla\String\StringHelper;
+use Psr\Container\ContainerInterface;
 
 /**
  * A content plugin to convert monetary values between different currencies and format them according to the current
@@ -22,8 +25,10 @@ use Joomla\String\StringHelper;
  *
  * @since  1.0.0
  */
-class ForExPlugin extends CMSPlugin implements SubscriberInterface
+class ForExPlugin extends CMSPlugin implements SubscriberInterface, BootableExtensionInterface
 {
+    private Container $container;
+
     /**
      * The ForEx conversion service
      *
@@ -52,6 +57,12 @@ class ForExPlugin extends CMSPlugin implements SubscriberInterface
         return [
             'onContentPrepare' => 'parseCurrencyConversions',
         ];
+    }
+
+    public function boot(ContainerInterface $container)
+    {
+        /** @noinspection PhpFieldAssignmentTypeMismatchInspection */
+        $this->container = $container;
     }
 
     /**
@@ -83,27 +94,29 @@ class ForExPlugin extends CMSPlugin implements SubscriberInterface
     }
 
     /**
-     * Set the ForEx service into the plugin
+     * Get the ForEx service from the provider
      *
-     * @param   ForEx  $forExService
-     *
-     * @since   1.0.1
+     * @return  ForEx
+     * @since   1.0.2
      */
-    public function setForExService(ForEx $forExService): void
+    public function getForExService(): ForEx
     {
-        $this->forex = $forExService;
+        $this->forex = $this->forex ?? $this->container->get(ForEx::class);
+
+        return $this->forex;
     }
 
     /**
-     * Set the formatter service into the plugin
+     * Get the formatter service from the provider
      *
-     * @param   Formatter  $formatterService
-     *
-     * @since   1.0.1
+     * @return  Formatter
+     * @since   1.0.2
      */
-    public function setFormatterService(Formatter $formatterService): void
+    public function getFormatterService(): Formatter
     {
-        $this->formatter = $formatterService;
+        $this->formatter = $this->formatter ?? $this->container->get(Formatter::class);
+
+        return $this->formatter;
     }
 
     /**
@@ -126,13 +139,13 @@ class ForExPlugin extends CMSPlugin implements SubscriberInterface
 
         if (count($arguments) == 2) {
             [$from, $to] = $arguments;
-            $newValue = $this->forex->convert($from, $to, $value);
+            $newValue = $this->getForExService()->convert($from, $to, $value);
             $value    = $newValue ?? $value;
             $currency = ($newValue === null) ? $from : $to;
         } else {
             $currency = $arguments[0];
         }
 
-        return $this->formatter->currency($currency, $value);
+        return $this->getFormatterService()->currency($currency, $value);
     }
 }

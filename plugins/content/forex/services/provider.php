@@ -33,8 +33,6 @@ return new class implements ServiceProviderInterface {
                 $plugin = new ForExPlugin($dispatcher, (array)$params);
 
                 $plugin->setApplication(Factory::getApplication());
-                $plugin->setForExService($container->get(ForExService::class));
-                $plugin->setFormatterService($container->get(FormatterService::class));
 
                 return $plugin;
             }

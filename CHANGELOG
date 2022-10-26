@@ -5,3 +5,7 @@ ForEx Conversion 1.0.0
 ForEx Conversion 1.0.1
 ================================================================================
 ~ Using services pushed through the provider
+
+ForEx Conversion 1.0.2
+================================================================================
+~ Late service initialisation using boot()
