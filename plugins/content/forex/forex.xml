@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<extension type="plugin" group="content" method="upgrade">
+    <name>plg_content_forex</name>
+    <version>1.0.0</version>
+    <creationDate>2022-10-26</creationDate>
+    <author>Nicholas K. Dionysopoulos</author>
+    <authorEmail>nicholas@dionysopoulos.me</authorEmail>
+    <authorUrl>https://www.dionysopoulos.me</authorUrl>
+    <copyright>Copyright (c) 2022 Nicholas K. Dionysopoulos</copyright>
+    <license>GNU General Public License version 2, or later</license>
+    <description>PLG_CONTENT_FOREX_XML_DESCRIPTION</description>
+    <namespace path="src">Joomla\Plugin\Content\ForEx</namespace>
+
+    <files>
+        <folder plugin="forex">services</folder>
+        <folder>src</folder>
+    </files>
+
+    <languages folder="language">
+        <language tag="en-GB">en-GB/plg_content_forex.ini</language>
+        <language tag="en-GB">en-GB/plg_content_forex.sys.ini</language>
+    </languages>
+</extension>
