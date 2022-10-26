@@ -10,12 +10,12 @@
 namespace Joomla\Plugin\Content\ForEx\Provider;
 
 use Joomla\CMS\Application\CMSApplication;
-use Joomla\CMS\Factory;
+use Joomla\CMS\Factory as JoomlaFactory;
 use Joomla\DI\Container;
 use Joomla\DI\ServiceProviderInterface;
-use Joomla\Plugin\Content\ForEx\Service\Formatter as FormatterService;
+use Joomla\Plugin\Content\ForEx\Service\Factory as FactoryService;
 
-class Formatter implements ServiceProviderInterface
+class Factory implements ServiceProviderInterface
 {
     /**
      * Registers the service provider with a DI container.
@@ -25,13 +25,13 @@ class Formatter implements ServiceProviderInterface
     public function register(Container $container)
     {
         $container->set(
-            FormatterService::class,
+            FactoryService::class,
             function(Container $container)
             {
                 /** @var CMSApplication $app */
-                $app = Factory::getApplication();
+                $app = JoomlaFactory::getApplication();
 
-                return new FormatterService($app);
+                return new FactoryService($container, $app);
             }
         );
     }

@@ -9,15 +9,13 @@
 namespace Joomla\Plugin\Content\ForEx\Extension;
 
 use Exception;
-use Joomla\CMS\Extension\BootableExtensionInterface;
 use Joomla\CMS\Plugin\CMSPlugin;
-use Joomla\DI\Container;
 use Joomla\Event\Event;
 use Joomla\Event\SubscriberInterface;
+use Joomla\Plugin\Content\ForEx\Service\Factory;
 use Joomla\Plugin\Content\ForEx\Service\ForEx;
 use Joomla\Plugin\Content\ForEx\Service\Formatter;
 use Joomla\String\StringHelper;
-use Psr\Container\ContainerInterface;
 
 /**
  * A content plugin to convert monetary values between different currencies and format them according to the current
@@ -25,9 +23,15 @@ use Psr\Container\ContainerInterface;
  *
  * @since  1.0.0
  */
-class ForExPlugin extends CMSPlugin implements SubscriberInterface, BootableExtensionInterface
+class ForExPlugin extends CMSPlugin implements SubscriberInterface
 {
-    private Container $container;
+    /**
+     * The plugin's service factory
+     *
+     * @since 1.0.4
+     * @var   Factory
+     */
+    private Factory $factory;
 
     /**
      * The ForEx conversion service
@@ -59,10 +63,30 @@ class ForExPlugin extends CMSPlugin implements SubscriberInterface, BootableExte
         ];
     }
 
-    public function boot(ContainerInterface $container)
+    /**
+     * Get the ForEx service from the provider
+     *
+     * @return  ForEx
+     * @since   1.0.2
+     */
+    public function getForExService(): ForEx
     {
-        /** @noinspection PhpFieldAssignmentTypeMismatchInspection */
-        $this->container = $container;
+        $this->forex = $this->forex ?? $this->factory->createForEx();
+
+        return $this->forex;
+    }
+
+    /**
+     * Get the formatter service from the provider
+     *
+     * @return  Formatter
+     * @since   1.0.2
+     */
+    public function getFormatterService(): Formatter
+    {
+        $this->formatter = $this->formatter ?? $this->factory->createFormatter();
+
+        return $this->formatter;
     }
 
     /**
@@ -94,29 +118,15 @@ class ForExPlugin extends CMSPlugin implements SubscriberInterface, BootableExte
     }
 
     /**
-     * Get the ForEx service from the provider
+     * Set the plugin's services factory
      *
-     * @return  ForEx
-     * @since   1.0.2
-     */
-    public function getForExService(): ForEx
-    {
-        $this->forex = $this->forex ?? $this->container->get(ForEx::class);
-
-        return $this->forex;
-    }
-
-    /**
-     * Get the formatter service from the provider
+     * @param   Factory  $factory  The plugin's services factory
      *
-     * @return  Formatter
-     * @since   1.0.2
+     * @since   1.0.4
      */
-    public function getFormatterService(): Formatter
+    public function setFactory(Factory $factory)
     {
-        $this->formatter = $this->formatter ?? $this->container->get(Formatter::class);
-
-        return $this->formatter;
+        $this->factory = $factory;
     }
 
     /**

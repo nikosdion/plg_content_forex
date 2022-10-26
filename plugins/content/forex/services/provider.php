@@ -13,10 +13,8 @@ use Joomla\DI\Container;
 use Joomla\DI\ServiceProviderInterface;
 use Joomla\Event\DispatcherInterface;
 use Joomla\Plugin\Content\ForEx\Extension\ForExPlugin;
-use Joomla\Plugin\Content\ForEx\Provider\ForEx;
-use Joomla\Plugin\Content\ForEx\Provider\Formatter;
-use Joomla\Plugin\Content\ForEx\Service\ForEx as ForExService;
-use Joomla\Plugin\Content\ForEx\Service\Formatter as FormatterService;
+use Joomla\Plugin\Content\ForEx\Provider\Factory as FactoryProvider;
+use Joomla\Plugin\Content\ForEx\Service\Factory as FactoryService;
 
 return new class implements ServiceProviderInterface {
 
@@ -25,14 +23,14 @@ return new class implements ServiceProviderInterface {
         $container->set(
             PluginInterface::class,
             function (Container $container) {
-                $container->registerServiceProvider(new ForEx());
-                $container->registerServiceProvider(new Formatter());
+                $container->registerServiceProvider(new FactoryProvider());
 
                 $params = PluginHelper::getPlugin('content', 'forex');
                 $dispatcher = $container->get(DispatcherInterface::class);
                 $plugin = new ForExPlugin($dispatcher, (array)$params);
 
                 $plugin->setApplication(Factory::getApplication());
+                $plugin->setFactory($container->get(FactoryService::class));
 
                 return $plugin;
             }
