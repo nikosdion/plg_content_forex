@@ -6,14 +6,14 @@
  * @license     GPL2
  */
 
-namespace Joomla\Plugin\Content\ForEx\Helper;
+namespace Joomla\Plugin\Content\ForEx\Service;
 
 use Exception;
 use Joomla\CMS\Factory;
 use NumberFormatter;
 
 /**
- * A monetary value formatter helper
+ * A monetary value formatter service
  *
  * @since  1.0.0
  */
@@ -31,7 +31,7 @@ class Formatter
      * @throws  Exception
      * @since   1.0.0
      */
-    public static function currency(string $currency, float $amount, ?string $locale = null): string
+    public function currency(string $currency, float $amount, ?string $locale = null): string
     {
         $locale = $locale ?? Factory::getApplication()->getLanguage()->getLocale()[0];
 
@@ -42,7 +42,7 @@ class Formatter
             return $formatter->formatCurrency($amount, $currency);
         }
 
-        $currency = self::currencySymbol($currency);
+        $currency = $this->currencySymbol($currency);
 
         return sprintf('%s %0.2f', $currency, $amount);
     }
@@ -58,7 +58,7 @@ class Formatter
      * @return  string  Currency symbol, if supported; otherwise the currency code.
      * @since   1.0.0
      */
-    private static function currencySymbol(string $currency): string
+    private function currencySymbol(string $currency): string
     {
         switch ($currency) {
             case 'LEK':

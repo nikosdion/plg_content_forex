@@ -10,11 +10,10 @@ namespace Joomla\Plugin\Content\ForEx\Extension;
 
 use Exception;
 use Joomla\CMS\Plugin\CMSPlugin;
-use Joomla\Event\DispatcherInterface;
 use Joomla\Event\Event;
 use Joomla\Event\SubscriberInterface;
-use Joomla\Plugin\Content\ForEx\Helper\Formatter;
 use Joomla\Plugin\Content\ForEx\Service\ForEx;
+use Joomla\Plugin\Content\ForEx\Service\Formatter;
 use Joomla\String\StringHelper;
 
 /**
@@ -34,19 +33,12 @@ class ForExPlugin extends CMSPlugin implements SubscriberInterface
     private ForEx $forex;
 
     /**
-     * Constructor
+     * The monetary value formatter service
      *
-     * @param   DispatcherInterface  $subject  The Joomla event dispatcher
-     * @param   array                $config   The plugin configuration parameters
-     *
-     * @since   1.0.0
+     * @since 1.0.0
+     * @var   Formatter
      */
-    public function __construct(&$subject, $config = [])
-    {
-        parent::__construct($subject, $config);
-
-        $this->forex = new ForEx();
-    }
+    private Formatter $formatter;
 
     /**
      * Returns an array of events this subscriber will listen to.
@@ -91,6 +83,30 @@ class ForExPlugin extends CMSPlugin implements SubscriberInterface
     }
 
     /**
+     * Set the ForEx service into the plugin
+     *
+     * @param   ForEx  $forExService
+     *
+     * @since   1.0.1
+     */
+    public function setForExService(ForEx $forExService): void
+    {
+        $this->forex = $forExService;
+    }
+
+    /**
+     * Set the formatter service into the plugin
+     *
+     * @param   Formatter  $formatterService
+     *
+     * @since   1.0.1
+     */
+    public function setFormatterService(Formatter $formatterService): void
+    {
+        $this->formatter = $formatterService;
+    }
+
+    /**
      * Callback for preg_replace_callback.
      *
      * Parses an individual plugin tag's contents and returns the formatted, and possibly converted, monetary value.
@@ -117,6 +133,6 @@ class ForExPlugin extends CMSPlugin implements SubscriberInterface
             $currency = $arguments[0];
         }
 
-        return Formatter::currency($currency, $value);
+        return $this->formatter->currency($currency, $value);
     }
 }

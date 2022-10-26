@@ -1,3 +1,7 @@
 ForEx Conversion 1.0.0
 ================================================================================
 + Initial release (naive implementation)
+
+ForEx Conversion 1.0.1
+================================================================================
+~ Using services pushed through the provider
